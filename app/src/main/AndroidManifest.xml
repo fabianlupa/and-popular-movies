@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MovieListActivity"
+            android:name=".views.MoviesListActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -19,13 +19,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MovieDetailActivity"
+            android:name=".views.MovieDetailActivity"
             android:label="@string/title_movie_detail"
-            android:parentActivityName=".MovieListActivity"
+            android:parentActivityName=".views.MoviesListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.flaiker.popularmovies.MovieListActivity" />
+                android:value=".views.MoviesListActivity" />
         </activity>
     </application>
 
