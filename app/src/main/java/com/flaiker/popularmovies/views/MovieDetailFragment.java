@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2016 Fabian Lupa
+ */
+
 package com.flaiker.popularmovies.views;
 
 import android.app.Activity;
@@ -14,9 +18,12 @@ import com.flaiker.popularmovies.databinding.MovieDetailBinding;
 import com.flaiker.popularmovies.models.Movie;
 import com.flaiker.popularmovies.viewmodels.MovieViewModel;
 
+/**
+ * Fragment for showing detailed information on a {@link Movie}.
+ */
 public class MovieDetailFragment extends Fragment {
     public static final String ARG_MOVIE_ID = "movie";
-    private MovieViewModel movie;
+    private MovieViewModel mMovieViewModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -31,13 +38,13 @@ public class MovieDetailFragment extends Fragment {
 
         if (getArguments().containsKey(ARG_MOVIE_ID)) {
             String arg = getArguments().getString(ARG_MOVIE_ID);
-            movie = new MovieViewModel(new Movie(arg, "NO IDEA"));
+            mMovieViewModel = new MovieViewModel(new Movie(arg, "NO IDEA"));
 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout =
                     (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(movie.getName());
+                appBarLayout.setTitle(mMovieViewModel.getName());
             }
         }
     }
@@ -47,7 +54,7 @@ public class MovieDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         MovieDetailBinding binding =
                 DataBindingUtil.inflate(inflater, R.layout.movie_detail, container, false);
-        binding.setVm(movie);
+        binding.setVm(mMovieViewModel);
 
         return binding.getRoot();
     }
