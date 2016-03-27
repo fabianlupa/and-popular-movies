@@ -57,6 +57,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             navigateUpTo(new Intent(this, MoviesListActivity.class));
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 }

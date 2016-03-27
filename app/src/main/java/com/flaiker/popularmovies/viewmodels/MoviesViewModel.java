@@ -20,20 +20,20 @@ public class MoviesViewModel extends BaseObservable {
 
     private List<InteractionListener> mListeners;
 
-
     public MoviesViewModel(List<MovieViewModel> movies) {
         this.movies = new ObservableArrayList<>();
         this.movies.addAll(movies);
 
         mListeners = new ArrayList<>();
 
-        for (MovieViewModel movie : this.movies)
+        for (MovieViewModel movie : this.movies) {
             movie.addListener(new MovieViewModel.Listener() {
                 @Override
                 public void onClick(MovieViewModel movie) {
                     showDetail(movie);
                 }
             });
+        }
     }
 
     public void showDetail(MovieViewModel movie) {
