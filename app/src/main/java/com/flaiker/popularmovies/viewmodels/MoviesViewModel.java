@@ -18,14 +18,14 @@ public class MoviesViewModel extends BaseObservable {
     public final ObservableList<MovieViewModel> movies;
     public final ItemView itemView = ItemView.of(BR.vm, R.layout.movie_list_content);
 
-    private List<InteractionListener> listeners;
+    private List<InteractionListener> mListeners;
 
 
     public MoviesViewModel(List<MovieViewModel> movies) {
         this.movies = new ObservableArrayList<>();
         this.movies.addAll(movies);
 
-        listeners = new ArrayList<>();
+        mListeners = new ArrayList<>();
 
         for (MovieViewModel movie : this.movies)
             movie.addListener(new MovieViewModel.Listener() {
@@ -37,14 +37,14 @@ public class MoviesViewModel extends BaseObservable {
     }
 
     public void showDetail(MovieViewModel movie) {
-        for (InteractionListener listener : listeners) listener.showDetail(movie.getId());
+        for (InteractionListener listener : mListeners) listener.showDetail(movie.getId());
     }
 
     public void addInteractionListener(InteractionListener listener) {
-        if (listeners.contains(listener))
+        if (mListeners.contains(listener))
             throw new IllegalArgumentException("Listener already registered.");
 
-        listeners.add(listener);
+        mListeners.add(listener);
     }
 
     public interface InteractionListener {

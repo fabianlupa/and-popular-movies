@@ -9,30 +9,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovieViewModel extends BaseObservable {
-    private final Movie movie;
-    private List<Listener> listeners;
+    private final Movie mMovie;
+    private List<Listener> mListeners;
 
     public MovieViewModel(Movie movie) {
-        this.listeners = new ArrayList<>();
-        this.movie = movie;
+        this.mListeners = new ArrayList<>();
+        this.mMovie = movie;
     }
 
     public String getId() {
-        return movie.getId();
+        return mMovie.getId();
     }
 
     public String getName() {
-        return movie.getName();
+        return mMovie.getName();
     }
 
     public void addListener(Listener listener) {
-        listeners.add(listener);
+        mListeners.add(listener);
     }
 
     public final View.OnClickListener onClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            for (Listener listener : listeners) listener.onClick(MovieViewModel.this);
+            for (Listener listener : mListeners) listener.onClick(MovieViewModel.this);
         }
     };
 

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MoviesListActivity extends AppCompatActivity implements MoviesViewModel.InteractionListener {
-    private boolean twoPaneMode;
+    private boolean mTwoPaneMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +51,13 @@ public class MoviesListActivity extends AppCompatActivity implements MoviesViewM
         });
 
         if (findViewById(R.id.movie_detail_container) != null) {
-            twoPaneMode = true;
+            mTwoPaneMode = true;
         }
     }
 
     @Override
     public void showDetail(String movieId) {
-        if (twoPaneMode) {
+        if (mTwoPaneMode) {
             Bundle arguments = new Bundle();
             arguments.putString(MovieDetailFragment.ARG_MOVIE_ID, movieId);
             MovieDetailFragment fragment = new MovieDetailFragment();
