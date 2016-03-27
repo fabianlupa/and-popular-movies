@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2016 Fabian Lupa
+ */
+
 package com.flaiker.popularmovies.views;
 
 import android.app.Activity;
