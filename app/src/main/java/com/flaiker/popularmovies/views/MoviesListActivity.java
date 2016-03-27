@@ -18,6 +18,12 @@ import com.flaiker.popularmovies.viewmodels.MoviesViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity for showing a quantity of {@link Movie movies} in an overview.
+ * <p/>
+ * This is the startup activity for the application. It supports showing detail views in either a
+ * dedicated activity or in this very activity using fragment transactions.
+ */
 public class MoviesListActivity extends AppCompatActivity implements MoviesViewModel.InteractionListener {
     private boolean mTwoPaneMode;
 

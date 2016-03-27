@@ -12,6 +12,12 @@ import android.view.View;
 
 import com.flaiker.popularmovies.R;
 
+/**
+ * Activity for showing detailed information on a {@link com.flaiker.popularmovies.models.Movie}.
+ * <p/>
+ * This uses a fragment ({@link MovieDetailFragment}) to show the content which is also used in
+ * {@link MoviesListActivity} if a master-detail type of view is to be shown on a tablet.
+ */
 public class MovieDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {

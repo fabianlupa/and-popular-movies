@@ -14,6 +14,9 @@ import com.flaiker.popularmovies.databinding.MovieDetailBinding;
 import com.flaiker.popularmovies.models.Movie;
 import com.flaiker.popularmovies.viewmodels.MovieViewModel;
 
+/**
+ * Fragment for showing detailed information on a {@link Movie}.
+ */
 public class MovieDetailFragment extends Fragment {
     public static final String ARG_MOVIE_ID = "movie";
     private MovieViewModel mMovieViewModel;
