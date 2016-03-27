@@ -26,6 +26,9 @@ public class MovieViewModel extends BaseObservable {
     }
 
     public void addListener(Listener listener) {
+        if (mListeners.contains(listener))
+            throw new IllegalArgumentException("Listener already registered.");
+
         mListeners.add(listener);
     }
 
