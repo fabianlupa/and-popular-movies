@@ -1,7 +1,3 @@
-/*
- * Copyright (C) 2016 Fabian Lupa
- */
-
 package com.flaiker.popularmovies.views;
 
 import android.content.Intent;
@@ -22,14 +18,8 @@ import com.flaiker.popularmovies.viewmodels.MoviesViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Activity for showing a quantity of {@link Movie movies} in an overview.
- * <p/>
- * This is the startup activity for the application. It supports showing detail views in either a
- * dedicated activity or in this very activity using fragment transactions.
- */
 public class MoviesListActivity extends AppCompatActivity implements MoviesViewModel.InteractionListener {
-    private boolean mTwoPaneMode;
+    private boolean twoPaneMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,13 +51,13 @@ public class MoviesListActivity extends AppCompatActivity implements MoviesViewM
         });
 
         if (findViewById(R.id.movie_detail_container) != null) {
-            mTwoPaneMode = true;
+            twoPaneMode = true;
         }
     }
 
     @Override
     public void showDetail(String movieId) {
-        if (mTwoPaneMode) {
+        if (twoPaneMode) {
             Bundle arguments = new Bundle();
             arguments.putString(MovieDetailFragment.ARG_MOVIE_ID, movieId);
             MovieDetailFragment fragment = new MovieDetailFragment();
