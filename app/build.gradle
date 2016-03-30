@@ -4,10 +4,6 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
 
-    dataBinding {
-        enabled = true
-    }
-
     defaultConfig {
         applicationId "com.flaiker.popularmovies"
         minSdkVersion 16
@@ -30,6 +26,4 @@ dependencies {
     compile 'com.android.support:support-v4:23.2.1'
     compile 'com.android.support:recyclerview-v7:23.2.1'
     compile 'com.android.support:design:23.2.1'
-    compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter:1.1.0'
-    compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter-recyclerview:1.1.0'
 }
