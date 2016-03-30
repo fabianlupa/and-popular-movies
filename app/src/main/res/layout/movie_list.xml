@@ -6,8 +6,9 @@
     android:name="com.flaiker.popularmovies.MovieListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    app:layoutManager="LinearLayoutManager"
+    android:layout_marginLeft="0dp"
+    android:layout_marginRight="0dp"
+    app:layoutManager="GridLayoutManager"
+    app:spanCount="2"
     tools:context="com.flaiker.popularmovies.MovieListActivity"
     tools:listitem="@layout/movie_list_content" />

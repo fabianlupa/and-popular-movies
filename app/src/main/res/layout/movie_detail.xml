@@ -1,9 +1,41 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/movie_detail"
-    style="?android:attr/textAppearanceLarge"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp"
-    android:textIsSelectable="true"
-    tools:context="com.flaiker.popularmovies.MovieDetailFragment" />
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/movie_detail_release_date"
+            style="?android:attr/textAppearanceLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textStyle="bold"
+            tools:context="com.flaiker.popularmovies.MovieDetailFragment"
+            tools:text="RELEASE_DATE" />
+
+        <TextView
+            android:id="@+id/movie_detail_votes"
+            style="?android:attr/textAppearanceLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            tools:context="com.flaiker.popularmovies.MovieDetailFragment"
+            tools:text="VOTES" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/movie_detail_synopsis"
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        tools:context="com.flaiker.popularmovies.MovieDetailFragment"
+        tools:text="LOREM LOREM LOREM IPSUM IPSUM IPSUM LOREM LOREM LOREM IPSUM IPSUM IPSUM" />
+</LinearLayout>

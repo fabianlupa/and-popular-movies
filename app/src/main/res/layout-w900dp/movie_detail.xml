@@ -1,0 +1,83 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/movie_detail_poster_tablet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/loading" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="@dimen/text_margin"
+        android:background="@color/colorPrimaryDarkTransparent"
+        android:orientation="vertical"
+        android:padding="@dimen/text_margin">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/movie_detail_title"
+                style="?android:attr/textAppearanceLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:padding="16dp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                tools:context="com.flaiker.popularmovies.MovieDetailFragment"
+                tools:text="TITLE" />
+
+            <TextView
+                android:id="@+id/movie_detail_release_date"
+                style="?android:attr/textAppearanceLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="none"
+                android:padding="16dp"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                tools:context="com.flaiker.popularmovies.MovieDetailFragment"
+                tools:text="RELEASE_DATE" />
+
+            <TextView
+                android:id="@+id/movie_detail_votes"
+                style="?android:attr/textAppearanceLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="none"
+                android:padding="16dp"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                tools:context="com.flaiker.popularmovies.MovieDetailFragment"
+                tools:text="VOTES" />
+
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/movie_detail_synopsis"
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:textColor="@android:color/white"
+                tools:context="com.flaiker.popularmovies.MovieDetailFragment"
+                tools:text="LOREM LOREM LOREM IPSUM IPSUM IPSUM LOREM LOREM LOREM IPSUM IPSUM IPSUM LOREM LOREM LOREM IPSUM IPSUM IPSUM LOREM LOREM LOREM IPSUM IPSUM IPSUM" />
+
+        </ScrollView>
+
+    </LinearLayout>
+</RelativeLayout>
