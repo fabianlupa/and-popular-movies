@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2016 Fabian Lupa
+ */
+
 package com.flaiker.popularmovies;
 
 import android.content.Context;
@@ -21,22 +25,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An activity representing a list of Movies. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link MovieDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
+ * Activity for showing movies loaded by {@link AsyncMovieLoader} in a grid.
+ * <p/>
+ * On tablets a detail fragment is loaded in the view, on phones {@link MovieDetailActivity} is
+ * launched to provide details.
  */
 public class MovieListActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Map<String, Movie>> {
 
+    /**
+     * Static map of the loaded movies. Needs to be accessible, as the detail fragment and the
+     * detail activity get it from here for now.
+     */
     public static Map<String, Movie> sMovies = new HashMap<>();
 
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
     private boolean mTwoPane;
     private RecyclerView mRecyclerView;
 
@@ -62,6 +64,7 @@ public class MovieListActivity extends AppCompatActivity
             mTwoPane = true;
         }
 
+        // Start loading the movies
         getSupportLoaderManager().initLoader(0, null, this);
         getSupportLoaderManager().restartLoader(0, null, this).forceLoad();
     }
@@ -110,8 +113,6 @@ public class MovieListActivity extends AppCompatActivity
             holder.mMovie = mMovies.get(position);
             Picasso.with(MovieListActivity.this).load(holder.mMovie.getImageUrl())
                     .error(R.drawable.loading).into(holder.mImageView);
-            //holder.mIdView.setText(mMovies.get(position).id);
-            //holder.mContentView.setText(mMovies.get(position).content);
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -143,21 +144,12 @@ public class MovieListActivity extends AppCompatActivity
         public class ViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
             public final ImageView mImageView;
-            // public final TextView mIdView;
-            // public final TextView mContentView;
             public Movie mMovie;
 
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
                 mImageView = (ImageView) view.findViewById(R.id.item_image_view);
-                //mIdView = (TextView) view.findViewById(R.id.id);
-                //mContentView = (TextView) view.findViewById(R.id.content);
-            }
-
-            @Override
-            public String toString() {
-                return super.toString();// + " '" + mContentView.getText() + "'";
             }
         }
     }

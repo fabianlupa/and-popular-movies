@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2016 Fabian Lupa
+ */
+
 package com.flaiker.popularmovies;
 
 import android.app.Activity;
@@ -15,15 +19,12 @@ import com.squareup.picasso.Picasso;
 import java.util.Calendar;
 
 /**
- * A fragment representing a single Movie detail screen.
- * This fragment is either contained in a {@link MovieListActivity}
- * in two-pane mode (on tablets) or a {@link MovieDetailActivity}
- * on handsets.
+ * Fragment for a movie detail screen. Used by {@link MovieDetailActivity} on smartphones and
+ * {@link MovieListActivity} on tablets.
  */
 public class MovieDetailFragment extends Fragment {
     /**
-     * The fragment argument representing the item ID that this fragment
-     * represents.
+     * ID of the movie to provide details for
      */
     public static final String ARG_ITEM_ID = "item_id";
 
@@ -41,11 +42,9 @@ public class MovieDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
-            // Load the dummy content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
             String key = getArguments().getString(ARG_ITEM_ID);
 
+            // Load movie from static field in the main activity for now
             if (MovieListActivity.sMovies.containsKey(key)) {
                 mMovie = MovieListActivity.sMovies.get(key);
 

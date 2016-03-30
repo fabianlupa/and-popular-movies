@@ -4,9 +4,9 @@
 
 package com.flaiker.popularmovies;
 
-import android.support.v4.content.AsyncTaskLoader;
 import android.content.Context;
 import android.net.Uri;
+import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -24,8 +24,22 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Loads movie data from the themoviedb.org webservice asynchronously.
+ */
 public class AsyncMovieLoader extends AsyncTaskLoader<Map<String, Movie>> {
     private static final String LOG = AsyncMovieLoader.class.getName();
+
+    private static final String RESULT_ARRAY_KEY = "results";
+    private static final String MOVIE_ID_KEY = "id";
+    private static final String MOVIE_TITLE_KEY = "title";
+    private static final String MOVIE_POSTER_KEY = "poster_path";
+    private static final String MOVIE_RELEASE_DATE_KEY = "release_date";
+    private static final String MOVIE_VOTE_AVERAGE_KEY = "vote_average";
+    private static final String MOVIE_OVERVIEW_KEY = "overview";
+    private static final String IMAGE_BASE_PATH = "https://image.tmdb.org/t/p/";
+    private static final String IMAGE_MEDIUM_RES = "w342/";
+    private static final String IMAGE_HIGH_RES = "w780/";
 
     public AsyncMovieLoader(Context context) {
         super(context);
@@ -46,6 +60,7 @@ public class AsyncMovieLoader extends AsyncTaskLoader<Map<String, Movie>> {
                 .build();
 
         try {
+            // Get api result
             URL url = new URL(uri.toString());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -56,27 +71,23 @@ public class AsyncMovieLoader extends AsyncTaskLoader<Map<String, Movie>> {
             }
             reader.close();
 
-            Log.i(LOG, String.format("API result:\n%s", stringBuilder.toString()));
-
             // Parse JSON
             JSONObject jObject = new JSONObject(stringBuilder.toString());
-            JSONArray results = jObject.getJSONArray("results");
+            JSONArray results = jObject.getJSONArray(RESULT_ARRAY_KEY);
             for (int i = 0; i < results.length(); i++) {
                 JSONObject jsonMovie = results.getJSONObject(i);
-                Movie movie = new Movie(jsonMovie.getString("id"),
-                        jsonMovie.getString("title"),
-                        "https://image.tmdb.org/t/p/w342/" + jsonMovie.getString("poster_path"),
-                        "https://image.tmdb.org/t/p/w780/" + jsonMovie.getString("poster_path"),
+                Movie movie = new Movie(jsonMovie.getString(MOVIE_ID_KEY),
+                        jsonMovie.getString(MOVIE_TITLE_KEY),
+                        IMAGE_BASE_PATH + IMAGE_MEDIUM_RES + jsonMovie.getString(MOVIE_POSTER_KEY),
+                        IMAGE_BASE_PATH + IMAGE_HIGH_RES + jsonMovie.getString(MOVIE_POSTER_KEY),
                         new SimpleDateFormat("yyyy-MM-DD", Locale.US)
-                                .parse(jsonMovie.getString("release_date")),
-                        Float.parseFloat(jsonMovie.getString("vote_average")),
-                        jsonMovie.getString("overview"));
+                                .parse(jsonMovie.getString(MOVIE_RELEASE_DATE_KEY)),
+                        Float.parseFloat(jsonMovie.getString(MOVIE_VOTE_AVERAGE_KEY)),
+                        jsonMovie.getString(MOVIE_OVERVIEW_KEY));
                 resultList.put(movie.getId(), movie);
             }
-        } catch (IOException e) {
+        } catch (IOException | ParseException | JSONException e) {
             Log.e(LOG, e.toString());
-        } catch (ParseException | JSONException e) {
-            e.printStackTrace();
         }
 
         return resultList;
