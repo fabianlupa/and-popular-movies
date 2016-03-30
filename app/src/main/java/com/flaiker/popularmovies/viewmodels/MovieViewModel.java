@@ -7,24 +7,31 @@ package com.flaiker.popularmovies.viewmodels;
 import android.databinding.BaseObservable;
 import android.view.View;
 
+import com.flaiker.popularmovies.managers.MovieManager;
 import com.flaiker.popularmovies.models.Movie;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * ViewModel to manage a single instance of {@link Movie}.
  */
 public class MovieViewModel extends BaseObservable {
-    private final Movie mMovie;
+    private final MovieManager movieManager;
+
+    private Movie mMovie;
     private List<Listener> mListeners;
 
-    /**
-     * @param movie The movie to manage
-     */
-    public MovieViewModel(Movie movie) {
+    @Inject
+    public MovieViewModel(MovieManager movieManager) {
+        this.movieManager = movieManager;
         this.mListeners = new ArrayList<>();
-        this.mMovie = movie;
+    }
+
+    public String setMovieId(String movieId() {
+        mMovie = movieManager.getMovieById(movieId);
     }
 
     public String getId() {
@@ -32,7 +39,11 @@ public class MovieViewModel extends BaseObservable {
     }
 
     public String getName() {
-        return mMovie.getName();
+        return mMovie.getTitle();
+    }
+
+    public String getImageUrl() {
+        return mMovie.getImageUrl();
     }
 
     /**

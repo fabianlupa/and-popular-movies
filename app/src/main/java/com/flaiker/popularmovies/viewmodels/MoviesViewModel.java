@@ -11,9 +11,12 @@ import android.databinding.ObservableList;
 
 import com.flaiker.popularmovies.BR;
 import com.flaiker.popularmovies.R;
+import com.flaiker.popularmovies.managers.MovieManager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import me.tatarka.bindingcollectionadapter.ItemView;
 
@@ -26,14 +29,14 @@ public class MoviesViewModel extends BaseObservable {
     public final ObservableList<MovieViewModel> movies;
     public final ItemView itemView = ItemView.of(BR.vm, R.layout.movie_list_content);
 
+    private final MovieManager movieManager;
+
     private List<InteractionListener> mListeners;
 
-    /**
-     * @param movies The MovieViewModels to manage
-     */
-    public MoviesViewModel(List<MovieViewModel> movies) {
+    @Inject
+    public MoviesViewModel(MovieManager movieManager) {
+        this.movieManager = movieManager;
         this.movies = new ObservableArrayList<>();
-        this.movies.addAll(movies);
 
         mListeners = new ArrayList<>();
 

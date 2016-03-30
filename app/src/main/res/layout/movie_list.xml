@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="vm"
+            name="movies"
             type="com.flaiker.popularmovies.viewmodels.MoviesViewModel" />
     </data>
     <android.support.v7.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
@@ -11,10 +11,10 @@
         android:name="com.flaiker.popularmovies.MovieListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        app:itemView="@{vm.itemView}"
-        app:items="@{vm.movies}"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        app:itemView="@{movies.itemView}"
+        app:items="@{movies.movies}"
         app:layoutManager="GridLayoutManager"
         app:spanCount="2"
         tools:context="com.flaiker.popularmovies.MovieListActivity"

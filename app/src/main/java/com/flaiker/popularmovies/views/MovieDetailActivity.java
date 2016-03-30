@@ -5,6 +5,7 @@
 package com.flaiker.popularmovies.views;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,6 +16,11 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.flaiker.popularmovies.R;
+import com.flaiker.popularmovies.databinding.ActivityMovieDetailBinding;
+import com.flaiker.popularmovies.models.Movie;
+import com.flaiker.popularmovies.viewmodels.MovieViewModel;
+
+import java.util.Date;
 
 /**
  * Activity for showing detailed information on a {@link com.flaiker.popularmovies.models.Movie}.
@@ -22,13 +28,20 @@ import com.flaiker.popularmovies.R;
  * This uses a fragment ({@link MovieDetailFragment}) to show the content which is also used in
  * {@link MoviesListActivity} if a master-detail type of view is to be shown on a tablet.
  */
-public class MovieDetailActivity extends AppCompatActivity {
+public class MovieDetailActivity extends AppCompatActivity
+        implements MovieDetailFragment.DependencyInjector {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_detail);
+
+        ActivityMovieDetailBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
+        binding.setMovie(new MovieViewModel(new Movie("1", "111", "https://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg", new Date(), 1, "LOREMLOREM")));
+        binding.executePendingBindings();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
+        setTitle(binding.getMovie().getName());
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -43,15 +56,19 @@ public class MovieDetailActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.invalidateOptionsMenu();
         }
+
+
+        invalidateOptionsMenu();
 
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
 
-            arguments.putString(MovieDetailFragment.ARG_MOVIE_ID,
-                    getIntent().getExtras().getString(MovieDetailFragment.ARG_MOVIE_ID));
+            //arguments.putString(MovieDetailFragment.ARG_MOVIE_ID,
+            //        getIntent().getExtras().getString(MovieDetailFragment.ARG_MOVIE_ID));
             MovieDetailFragment fragment = new MovieDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
@@ -69,5 +86,10 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public MovieViewModel getMovieViewModel() {
+        return
     }
 }

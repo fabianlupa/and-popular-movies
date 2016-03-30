@@ -5,14 +5,19 @@
             name="vm"
             type="com.flaiker.popularmovies.viewmodels.MovieViewModel" />
     </data>
-    <TextView
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/movie_detail"
-        style="?android:attr/textAppearanceLarge"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp"
-        android:textIsSelectable="true"
-        tools:context="com.flaiker.popularmovies.views.MovieDetailFragment"
-        android:text="@{vm.id}" />
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/movie_detail"
+            style="?android:attr/textAppearanceLarge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:textIsSelectable="true"
+            tools:context="com.flaiker.popularmovies.views.MovieDetailFragment"
+            android:text="@{vm.id}" />
+
+    </LinearLayout>
 </layout>

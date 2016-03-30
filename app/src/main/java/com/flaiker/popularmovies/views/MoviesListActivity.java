@@ -16,11 +16,7 @@ import android.view.View;
 import com.flaiker.popularmovies.R;
 import com.flaiker.popularmovies.databinding.ActivityMovieListBinding;
 import com.flaiker.popularmovies.models.Movie;
-import com.flaiker.popularmovies.viewmodels.MovieViewModel;
 import com.flaiker.popularmovies.viewmodels.MoviesViewModel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Activity for showing a quantity of {@link Movie movies} in an overview.
@@ -28,7 +24,8 @@ import java.util.List;
  * This is the startup activity for the application. It supports showing detail views in either a
  * dedicated activity or in this very activity using fragment transactions.
  */
-public class MoviesListActivity extends AppCompatActivity implements MoviesViewModel.InteractionListener {
+public class MoviesListActivity extends AppCompatActivity
+        implements MoviesViewModel.InteractionListener {
     private boolean mTwoPaneMode;
 
     @Override
@@ -37,14 +34,13 @@ public class MoviesListActivity extends AppCompatActivity implements MoviesViewM
         ActivityMovieListBinding binding =
                 DataBindingUtil.setContentView(this, R.layout.activity_movie_list);
 
-        List<MovieViewModel> movieList = new ArrayList<>();
-        movieList.add(new MovieViewModel(new Movie("1", "Movie1")));
-        movieList.add(new MovieViewModel(new Movie("2", "Movie2")));
-        movieList.add(new MovieViewModel(new Movie("3", "Movie3")));
-        MoviesViewModel vm = new MoviesViewModel(movieList);
-        vm.addInteractionListener(this);
-        binding.setVm(vm);
+        MoviesViewModel moviesViewModel = new MoviesViewModel(this);
+        moviesViewModel.addInteractionListener(this);
+        binding.setMovies(moviesViewModel);
         binding.executePendingBindings();
+
+        getSupportLoaderManager().initLoader(0, null, moviesViewModel);
+        getSupportLoaderManager().restartLoader(0, null, moviesViewModel).forceLoad();
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

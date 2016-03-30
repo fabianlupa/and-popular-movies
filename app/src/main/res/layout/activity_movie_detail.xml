@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
         <variable
-            name="vm"
+            name="movie"
             type="com.flaiker.popularmovies.viewmodels.MovieViewModel" />
     </data>
 
     <android.support.design.widget.CoordinatorLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,7 +19,7 @@
         <android.support.design.widget.AppBarLayout
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/app_bar_height"
+            android:layout_height="400dp"
             android:fitsSystemWindows="true"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
@@ -31,11 +32,19 @@
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:toolbarId="@+id/toolbar">
 
+                <ImageView
+                    android:id="@+id/image_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    app:layout_collapseMode="parallax"
+                    app:error="@{@color/colorPrimary}"
+                    app:imageUrl="@{movie.imageUrl}" />
+
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/detail_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    android:title="@{vm.name, default=Movie}"
                     app:layout_collapseMode="pin"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
