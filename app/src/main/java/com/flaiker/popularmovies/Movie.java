@@ -6,6 +6,9 @@ package com.flaiker.popularmovies;
 
 import java.util.Date;
 
+/**
+ * Model for a movie and its properties.
+ */
 public class Movie {
     private final String id;
     private final String title;
