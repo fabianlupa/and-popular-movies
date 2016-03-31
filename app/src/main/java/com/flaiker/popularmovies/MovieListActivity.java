@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -70,8 +72,45 @@ public class MovieListActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_sort_popular:
+                Bundle bundle = new Bundle();
+                bundle.putInt(AsyncMovieLoader.ARG_SORT_ORDER, AsyncMovieLoader.SORT_ORDER_POPULAR);
+                getSupportLoaderManager().restartLoader(0, bundle, this).forceLoad();
+
+                return true;
+            case R.id.menu_sort_top_rated:
+                Bundle bundle2 = new Bundle();
+                bundle2.putInt(AsyncMovieLoader.ARG_SORT_ORDER,
+                        AsyncMovieLoader.SORT_ORDER_TOP_RATED);
+                getSupportLoaderManager().restartLoader(0, bundle2, this).forceLoad();
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public Loader<Map<String, Movie>> onCreateLoader(int id, Bundle args) {
-        return new AsyncMovieLoader(this);
+        AsyncMovieLoader.SortOrder sortOrder;
+
+        if (args != null && args.containsKey(AsyncMovieLoader.ARG_SORT_ORDER)) {
+            sortOrder = AsyncMovieLoader.SortOrder
+                    .fromInt(args.getInt(AsyncMovieLoader.ARG_SORT_ORDER));
+        } else {
+            sortOrder = AsyncMovieLoader.SortOrder.POPULAR;
+        }
+
+        return new AsyncMovieLoader(this, sortOrder);
     }
 
     @Override

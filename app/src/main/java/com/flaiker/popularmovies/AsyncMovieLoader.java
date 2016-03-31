@@ -30,6 +30,12 @@ import java.util.Map;
 public class AsyncMovieLoader extends AsyncTaskLoader<Map<String, Movie>> {
     private static final String LOG = AsyncMovieLoader.class.getName();
 
+    // Arguments
+    public static final String ARG_SORT_ORDER = "sort_order";
+    public static final int SORT_ORDER_POPULAR = 0;
+    public static final int SORT_ORDER_TOP_RATED = 1;
+
+    // JSON deserialization
     private static final String RESULT_ARRAY_KEY = "results";
     private static final String MOVIE_ID_KEY = "id";
     private static final String MOVIE_TITLE_KEY = "title";
@@ -41,8 +47,11 @@ public class AsyncMovieLoader extends AsyncTaskLoader<Map<String, Movie>> {
     private static final String IMAGE_MEDIUM_RES = "w342/";
     private static final String IMAGE_HIGH_RES = "w780/";
 
-    public AsyncMovieLoader(Context context) {
+    private final SortOrder mSortOrder;
+
+    public AsyncMovieLoader(Context context, SortOrder sortOrder) {
         super(context);
+        mSortOrder = sortOrder;
     }
 
     @Override
@@ -55,7 +64,7 @@ public class AsyncMovieLoader extends AsyncTaskLoader<Map<String, Movie>> {
                 .authority("api.themoviedb.org")
                 .appendPath("3")
                 .appendPath("movie")
-                .appendPath("popular")
+                .appendPath(mSortOrder.toString().toLowerCase())
                 .appendQueryParameter("api_key", BuildConfig.MOVIEDB_API_KEY)
                 .build();
 
@@ -91,5 +100,21 @@ public class AsyncMovieLoader extends AsyncTaskLoader<Map<String, Movie>> {
         }
 
         return resultList;
+    }
+
+    public enum SortOrder {
+        POPULAR,
+        TOP_RATED;
+
+        public static SortOrder fromInt(int i) {
+            switch (i) {
+                case SORT_ORDER_POPULAR:
+                    return POPULAR;
+                case SORT_ORDER_TOP_RATED:
+                    return TOP_RATED;
+                default:
+                    return POPULAR;
+            }
+        }
     }
 }
