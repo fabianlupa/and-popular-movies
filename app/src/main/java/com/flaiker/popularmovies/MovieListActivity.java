@@ -6,8 +6,10 @@ package com.flaiker.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -19,27 +21,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.flaiker.popularmovies.contentprovider.MovieContract;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
- * Activity for showing movies loaded by {@link AsyncMovieLoader} in a grid.
+ * Activity for showing movies loaded by {@link FetchMovieTask} in a grid.
  * <p/>
  * On tablets a detail fragment is loaded in the view, on phones {@link MovieDetailActivity} is
  * launched to provide details.
  */
 public class MovieListActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Map<String, Movie>> {
-
-    /**
-     * Static map of the loaded movies. Needs to be accessible, as the detail fragment and the
-     * detail activity get it from here for now.
-     */
-    public static Map<String, Movie> sMovies = new HashMap<>();
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private boolean mTwoPane;
     private RecyclerView mRecyclerView;
@@ -68,7 +60,10 @@ public class MovieListActivity extends AppCompatActivity
 
         // Start loading the movies
         getSupportLoaderManager().initLoader(0, null, this);
-        getSupportLoaderManager().restartLoader(0, null, this).forceLoad();
+        //getSupportLoaderManager().restartLoader(0, null, this).forceLoad();
+
+        FetchMovieTask task = new FetchMovieTask(this);
+        task.execute();
     }
 
     @Override
@@ -81,7 +76,8 @@ public class MovieListActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_sort_popular:
+            // TODO: Add handling for sort order
+            /*case R.id.menu_sort_popular:
                 Bundle bundle = new Bundle();
                 bundle.putInt(AsyncMovieLoader.ARG_SORT_ORDER, AsyncMovieLoader.SORT_ORDER_POPULAR);
                 getSupportLoaderManager().restartLoader(0, bundle, this).forceLoad();
@@ -93,51 +89,48 @@ public class MovieListActivity extends AppCompatActivity
                         AsyncMovieLoader.SORT_ORDER_TOP_RATED);
                 getSupportLoaderManager().restartLoader(0, bundle2, this).forceLoad();
 
-                return true;
+                return true;*/
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
     @Override
-    public Loader<Map<String, Movie>> onCreateLoader(int id, Bundle args) {
-        AsyncMovieLoader.SortOrder sortOrder;
-
-        if (args != null && args.containsKey(AsyncMovieLoader.ARG_SORT_ORDER)) {
-            sortOrder = AsyncMovieLoader.SortOrder
-                    .fromInt(args.getInt(AsyncMovieLoader.ARG_SORT_ORDER));
-        } else {
-            sortOrder = AsyncMovieLoader.SortOrder.POPULAR;
-        }
-
-        return new AsyncMovieLoader(this, sortOrder);
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this, MovieContract.MovieEntry.CONTENT_URI, null, null, null, null);
     }
 
     @Override
-    public void onLoadFinished(Loader<Map<String, Movie>> loader, Map<String, Movie> data) {
-        sMovies = data;
-
-        ((SimpleItemRecyclerViewAdapter) mRecyclerView.getAdapter())
-                .updateMovies(new ArrayList<>(data.values()));
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        ((SimpleItemRecyclerViewAdapter) mRecyclerView.getAdapter()).swapCursor(data);
     }
 
     @Override
-    public void onLoaderReset(Loader<Map<String, Movie>> loader) {
-
+    public void onLoaderReset(Loader<Cursor> loader) {
+        ((SimpleItemRecyclerViewAdapter) mRecyclerView.getAdapter()).swapCursor(null);
     }
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private List<Movie> mMovies;
+        Cursor dataCursor;
 
         public SimpleItemRecyclerViewAdapter() {
-            mMovies = new ArrayList<>();
         }
 
-        public void updateMovies(List<Movie> movies) {
-            mMovies = movies;
-            notifyDataSetChanged();
+        public Cursor swapCursor(Cursor cursor) {
+            if (dataCursor == cursor) return null;
+
+            Cursor oldCursor = dataCursor;
+            dataCursor = cursor;
+            if (cursor != null) notifyDataSetChanged();
+
+            return oldCursor;
+        }
+
+        public void changeCursor(Cursor cursor) {
+            Cursor oldCursor = swapCursor(cursor);
+            if (oldCursor != null) oldCursor.close();
         }
 
         @Override
@@ -149,8 +142,11 @@ public class MovieListActivity extends AppCompatActivity
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mMovie = mMovies.get(position);
-            Picasso.with(MovieListActivity.this).load(holder.mMovie.getImageUrl())
+            final Movie movie = getMovie(position);
+
+            if (movie == null) return;
+
+            Picasso.with(MovieListActivity.this).load(movie.getImageUrl())
                     .error(R.drawable.loading).into(holder.mImageView);
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -158,7 +154,8 @@ public class MovieListActivity extends AppCompatActivity
                 public void onClick(View v) {
                     if (mTwoPane) {
                         Bundle arguments = new Bundle();
-                        arguments.putString(MovieDetailFragment.ARG_ITEM_ID, holder.mMovie.getId());
+                        arguments.putParcelable(MovieDetailFragment.ARG_MOVIE_URI,
+                                MovieContract.MovieEntry.buildMovieUri(movie.getId()));
                         MovieDetailFragment fragment = new MovieDetailFragment();
                         fragment.setArguments(arguments);
                         getSupportFragmentManager().beginTransaction()
@@ -167,7 +164,8 @@ public class MovieListActivity extends AppCompatActivity
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, MovieDetailActivity.class);
-                        intent.putExtra(MovieDetailFragment.ARG_ITEM_ID, holder.mMovie.getId());
+                        intent.putExtra(MovieDetailFragment.ARG_MOVIE_URI,
+                                MovieContract.MovieEntry.buildMovieUri(movie.getId()));
 
                         context.startActivity(intent);
                     }
@@ -177,13 +175,17 @@ public class MovieListActivity extends AppCompatActivity
 
         @Override
         public int getItemCount() {
-            return mMovies.size();
+            return (dataCursor == null) ? 0 : dataCursor.getCount();
+        }
+
+        private Movie getMovie(int position) {
+            dataCursor.moveToPosition(position);
+            return Movie.fromCursor(dataCursor);
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
             public final ImageView mImageView;
-            public Movie mMovie;
 
             public ViewHolder(View view) {
                 super(view);

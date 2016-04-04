@@ -5,7 +5,12 @@
 package com.flaiker.popularmovies;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,7 +24,13 @@ import com.squareup.picasso.Picasso;
  * <p/>
  * Not used on tablet devices.
  */
-public class MovieDetailActivity extends AppCompatActivity {
+public class MovieDetailActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private ActionBar mActionBar;
+    private ImageView mPosterView;
+
+    private Uri mUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,26 +40,20 @@ public class MovieDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // Show the Up button in the action bar.
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar = getSupportActionBar();
+        if (mActionBar != null) {
+            mActionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        ImageView posterView = (ImageView) findViewById(R.id.detail_image_view);
+        mPosterView = (ImageView) findViewById(R.id.detail_image_view);
 
-        String id = getIntent().getStringExtra(MovieDetailFragment.ARG_ITEM_ID);
-        if (id != null) {
-            if (MovieListActivity.sMovies.containsKey(id)) {
-                Movie movie = MovieListActivity.sMovies.get(id);
-                Picasso.with(this).load(movie.getImageUrl()).error(R.drawable.loading)
-                        .into(posterView);
-            }
-        }
+        mUri = getIntent().getParcelableExtra(MovieDetailFragment.ARG_MOVIE_URI);
+
+        getSupportLoaderManager().initLoader(0, null, this);
 
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
-            arguments.putString(MovieDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(MovieDetailFragment.ARG_ITEM_ID));
+            arguments.putParcelable(MovieDetailFragment.ARG_MOVIE_URI, mUri);
             MovieDetailFragment fragment = new MovieDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
@@ -65,5 +70,30 @@ public class MovieDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if (null != mUri) {
+            return new CursorLoader(this, mUri, null, null, null, null);
+        }
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        data.moveToFirst();
+        Movie movie = Movie.fromCursor(data);
+
+        if (movie != null) {
+            mActionBar.setTitle(movie.getTitle());
+            Picasso.with(this).load(movie.getBigImageUrl()).error(R.drawable.loading)
+                    .into(mPosterView);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

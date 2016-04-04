@@ -4,10 +4,13 @@
 
 package com.flaiker.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
-import android.support.v4.content.AsyncTaskLoader;
+import android.os.AsyncTask;
 import android.util.Log;
+
+import com.flaiker.popularmovies.contentprovider.MovieContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,22 +21,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.Vector;
 
-/**
- * Loads movie data from the themoviedb.org webservice asynchronously.
- */
-public class AsyncMovieLoader extends AsyncTaskLoader<Map<String, Movie>> {
-    private static final String LOG = AsyncMovieLoader.class.getName();
+public class FetchMovieTask extends AsyncTask<String, Void, Void> {
+    private static final String LOG = FetchMovieTask.class.getName();
 
     // Arguments
-    public static final String ARG_SORT_ORDER = "sort_order";
-    public static final int SORT_ORDER_POPULAR = 0;
-    public static final int SORT_ORDER_TOP_RATED = 1;
+    public static final String SORT_ORDER_POPULAR = "POPULAR";
+    public static final String SORT_ORDER_TOP_RATED = "TOP_RATED";
 
     // JSON deserialization
     private static final String RESULT_ARRAY_KEY = "results";
@@ -47,16 +42,21 @@ public class AsyncMovieLoader extends AsyncTaskLoader<Map<String, Movie>> {
     private static final String IMAGE_MEDIUM_RES = "w342/";
     private static final String IMAGE_HIGH_RES = "w780/";
 
-    private final SortOrder mSortOrder;
+    private final Context mContext;
 
-    public AsyncMovieLoader(Context context, SortOrder sortOrder) {
-        super(context);
-        mSortOrder = sortOrder;
+    public FetchMovieTask(Context context) {
+        mContext = context;
     }
 
     @Override
-    public Map<String, Movie> loadInBackground() {
-        Map<String, Movie> resultList = new HashMap<>();
+    protected Void doInBackground(String... params) {
+        String sortOrder;
+        if (params.length == 0 || (!params[0].equals(SORT_ORDER_POPULAR) &&
+                !params[0].equals(SORT_ORDER_TOP_RATED))) {
+            sortOrder = SORT_ORDER_POPULAR;
+        } else {
+            sortOrder = params[0];
+        }
 
         // Build query URI
         Uri uri = new Uri.Builder()
@@ -64,7 +64,7 @@ public class AsyncMovieLoader extends AsyncTaskLoader<Map<String, Movie>> {
                 .authority("api.themoviedb.org")
                 .appendPath("3")
                 .appendPath("movie")
-                .appendPath(mSortOrder.toString().toLowerCase())
+                .appendPath(sortOrder.toLowerCase())
                 .appendQueryParameter("api_key", BuildConfig.MOVIEDB_API_KEY)
                 .build();
 
@@ -83,9 +83,10 @@ public class AsyncMovieLoader extends AsyncTaskLoader<Map<String, Movie>> {
             // Parse JSON
             JSONObject jObject = new JSONObject(stringBuilder.toString());
             JSONArray results = jObject.getJSONArray(RESULT_ARRAY_KEY);
+            Vector<ContentValues> vector = new Vector<>(results.length());
             for (int i = 0; i < results.length(); i++) {
                 JSONObject jsonMovie = results.getJSONObject(i);
-                Movie movie = new Movie(jsonMovie.getString(MOVIE_ID_KEY),
+                /*Movie movie = new Movie(jsonMovie.getString(MOVIE_ID_KEY),
                         jsonMovie.getString(MOVIE_TITLE_KEY),
                         IMAGE_BASE_PATH + IMAGE_MEDIUM_RES + jsonMovie.getString(MOVIE_POSTER_KEY),
                         IMAGE_BASE_PATH + IMAGE_HIGH_RES + jsonMovie.getString(MOVIE_POSTER_KEY),
@@ -93,28 +94,26 @@ public class AsyncMovieLoader extends AsyncTaskLoader<Map<String, Movie>> {
                                 .parse(jsonMovie.getString(MOVIE_RELEASE_DATE_KEY)),
                         Float.parseFloat(jsonMovie.getString(MOVIE_VOTE_AVERAGE_KEY)),
                         jsonMovie.getString(MOVIE_OVERVIEW_KEY));
-                resultList.put(movie.getId(), movie);
+                resultList.put(movie.getId(), movie);*/
+
+                ContentValues values = new ContentValues();
+                values.put(MovieContract.MovieEntry.COLUMN_ID, jsonMovie.getString(MOVIE_ID_KEY));
+                values.put(MovieContract.MovieEntry.COLUMN_TITLE, jsonMovie.getString(MOVIE_TITLE_KEY));
+                values.put(MovieContract.MovieEntry.COLUMN_IMAGE, jsonMovie.getString(MOVIE_POSTER_KEY));
+                values.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, jsonMovie.getString(MOVIE_RELEASE_DATE_KEY));
+                values.put(MovieContract.MovieEntry.COLUMN_VOTES_AVERAGE, jsonMovie.getString(MOVIE_VOTE_AVERAGE_KEY));
+                values.put(MovieContract.MovieEntry.COLUMN_SYNOPSIS, jsonMovie.getString(MOVIE_OVERVIEW_KEY));
+
+                vector.add(values);
             }
-        } catch (IOException | ParseException | JSONException e) {
+
+            ContentValues[] cvArray = new ContentValues[vector.size()];
+            vector.toArray(cvArray);
+            mContext.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
+        } catch (IOException | JSONException e) {
             Log.e(LOG, e.toString());
         }
 
-        return resultList;
-    }
-
-    public enum SortOrder {
-        POPULAR,
-        TOP_RATED;
-
-        public static SortOrder fromInt(int i) {
-            switch (i) {
-                case SORT_ORDER_POPULAR:
-                    return POPULAR;
-                case SORT_ORDER_TOP_RATED:
-                    return TOP_RATED;
-                default:
-                    return POPULAR;
-            }
-        }
+        return null;
     }
 }
