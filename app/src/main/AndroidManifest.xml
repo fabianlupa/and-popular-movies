@@ -29,6 +29,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.flaiker.popularmovies.MovieListActivity" />
         </activity>
+
+        <provider
+            android:name=".contentprovider.MovieProvider"
+            android:authorities="com.flaiker.popularmovies" />
     </application>
 
 </manifest>
