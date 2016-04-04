@@ -113,7 +113,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             mRating.setText(String.format(Locale.US, "%.2f/10", movie.getVotesAverage()));
             mSynopsis.setText(movie.getSynopsis());
             if (mImageTablet != null) {
-                Picasso.with(getActivity()).load(movie.getBigImageUrl()).error(R.drawable.loading)
+                Picasso.with(getActivity()).load(movie.getImageUrl()).error(R.drawable.loading)
                         .into(mImageTablet);
             }
             if (mTitleTablet != null) mTitleTablet.setText(movie.getTitle());
