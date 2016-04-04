@@ -98,6 +98,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
                 ContentValues values = new ContentValues();
                 values.put(MovieContract.MovieEntry.COLUMN_ID, jsonMovie.getString(MOVIE_ID_KEY));
+                values.put(MovieContract.MovieEntry.COLUMN_CONTEXT, sortOrder);
                 values.put(MovieContract.MovieEntry.COLUMN_TITLE, jsonMovie.getString(MOVIE_TITLE_KEY));
                 values.put(MovieContract.MovieEntry.COLUMN_IMAGE, jsonMovie.getString(MOVIE_POSTER_KEY));
                 values.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, jsonMovie.getString(MOVIE_RELEASE_DATE_KEY));
