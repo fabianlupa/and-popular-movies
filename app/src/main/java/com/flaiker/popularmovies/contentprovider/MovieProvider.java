@@ -14,16 +14,21 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.flaiker.popularmovies.Movie;
+
 /**
  * {@link ContentProvider} class for internal movie database.
  */
 public class MovieProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private static final String sMovieByIdSelection = MovieContract.MovieEntry.COLUMN_ID + " = ?";
+    private static final String sMoviesByContextSelection =
+            MovieContract.MovieEntry.COLUMN_CONTEXT + " = ?";
 
     private static final int MOVIES_POPULAR = 100;
     private static final int MOVIES_TOP_RATED = 101;
-    private static final int MOVIE_WITH_ID = 102;
+    private static final int MOVIES_FAVORITES = 102;
+    private static final int MOVIE_WITH_ID = 103;
 
     private MovieDbHelper mOpenHelper;
 
@@ -33,7 +38,8 @@ public class MovieProvider extends ContentProvider {
 
         matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIES_POPULAR);
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/popular", MOVIES_POPULAR);
-        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/top", MOVIES_TOP_RATED);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/top_rated", MOVIES_TOP_RATED);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/favorites", MOVIES_FAVORITES);
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/*", MOVIE_WITH_ID);
 
         return matcher;
@@ -53,13 +59,33 @@ public class MovieProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
             case MOVIES_POPULAR:
-                // TODO: Implement handling for popular and top rated movies
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        sMoviesByContextSelection,
+                        new String[]{Movie.Context.POPULAR.toString()},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
             case MOVIES_TOP_RATED:
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_NAME,
                         projection,
-                        selection,
-                        selectionArgs,
+                        sMoviesByContextSelection,
+                        new String[]{Movie.Context.TOP_RATED.toString()},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case MOVIES_FAVORITES:
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        sMoviesByContextSelection,
+                        new String[]{Movie.Context.FAVORITE.toString()},
                         null,
                         null,
                         sortOrder

@@ -9,4 +9,9 @@
         android:id="@+id/menu_sort_top_rated"
         android:icon="@android:drawable/ic_menu_view"
         android:title="@string/menu_sort_top_rated" />
+
+    <item
+        android:id="@+id/menu_sort_favorites"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="@string/menu_sort_favorites" />
 </menu>

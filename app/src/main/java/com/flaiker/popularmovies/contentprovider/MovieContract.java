@@ -30,6 +30,7 @@ public class MovieContract {
         public static final String TABLE_NAME = "movie";
 
         public static final String COLUMN_ID = "id";
+        public static final String COLUMN_CONTEXT = "context";
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_IMAGE = "image";
         public static final String COLUMN_RELEASE_DATE = "release_date";

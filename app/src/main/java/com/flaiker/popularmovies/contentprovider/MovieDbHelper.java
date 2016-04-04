@@ -15,7 +15,7 @@ import static com.flaiker.popularmovies.contentprovider.MovieContract.MovieEntry
  */
 public class MovieDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "movies.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     public MovieDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -24,12 +24,14 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
-                MovieEntry.COLUMN_ID + " INTEGER PRIMARY KEY, " +
+                MovieEntry.COLUMN_ID + " INTEGER, " +
+                MovieEntry.COLUMN_CONTEXT + " TEXT, " +
                 MovieEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_IMAGE + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_VOTES_AVERAGE + " REAL NOT NULL, " +
                 MovieEntry.COLUMN_SYNOPSIS + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_RELEASE_DATE + " DATE NOT NULL);";
+                MovieEntry.COLUMN_RELEASE_DATE + " DATE NOT NULL, " +
+                "PRIMARY KEY (" + MovieEntry.COLUMN_ID + ", " + MovieEntry.COLUMN_CONTEXT + "));";
 
         db.execSQL(SQL_CREATE_MOVIES_TABLE);
     }

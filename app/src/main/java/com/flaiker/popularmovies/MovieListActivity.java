@@ -33,6 +33,10 @@ import com.squareup.picasso.Picasso;
 public class MovieListActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final int MOVIE_POPULAR_LOADER = 1;
+    private static final int MOVIE_TOP_RATED_LOADER = 2;
+    private static final int MOVIE_FAVORITE_LOADER = 3;
+
     private boolean mTwoPane;
     private RecyclerView mRecyclerView;
 
@@ -59,11 +63,15 @@ public class MovieListActivity extends AppCompatActivity
         }
 
         // Start loading the movies
-        getSupportLoaderManager().initLoader(0, null, this);
-        //getSupportLoaderManager().restartLoader(0, null, this).forceLoad();
+        getSupportLoaderManager().initLoader(MOVIE_POPULAR_LOADER, null, this).forceLoad();
+        getSupportLoaderManager().initLoader(MOVIE_TOP_RATED_LOADER, null, this);
+        getSupportLoaderManager().initLoader(MOVIE_FAVORITE_LOADER, null, this);
 
+        // TODO: Load movies using a service
         FetchMovieTask task = new FetchMovieTask(this);
-        task.execute();
+        task.execute(FetchMovieTask.SORT_ORDER_POPULAR);
+        FetchMovieTask task2 = new FetchMovieTask(this);
+        task2.execute(FetchMovieTask.SORT_ORDER_TOP_RATED);
     }
 
     @Override
@@ -76,20 +84,16 @@ public class MovieListActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // TODO: Add handling for sort order
-            /*case R.id.menu_sort_popular:
-                Bundle bundle = new Bundle();
-                bundle.putInt(AsyncMovieLoader.ARG_SORT_ORDER, AsyncMovieLoader.SORT_ORDER_POPULAR);
-                getSupportLoaderManager().restartLoader(0, bundle, this).forceLoad();
-
+            case R.id.menu_sort_popular:
+                getSupportLoaderManager().initLoader(MOVIE_POPULAR_LOADER, null, this).forceLoad();
                 return true;
             case R.id.menu_sort_top_rated:
-                Bundle bundle2 = new Bundle();
-                bundle2.putInt(AsyncMovieLoader.ARG_SORT_ORDER,
-                        AsyncMovieLoader.SORT_ORDER_TOP_RATED);
-                getSupportLoaderManager().restartLoader(0, bundle2, this).forceLoad();
-
-                return true;*/
+                getSupportLoaderManager().initLoader(MOVIE_TOP_RATED_LOADER, null, this)
+                        .forceLoad();
+                return true;
+            case R.id.menu_sort_favorites:
+                getSupportLoaderManager().initLoader(MOVIE_FAVORITE_LOADER, null, this).forceLoad();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -97,12 +101,47 @@ public class MovieListActivity extends AppCompatActivity
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, MovieContract.MovieEntry.CONTENT_URI, null, null, null, null);
+        switch (id) {
+            case MOVIE_POPULAR_LOADER:
+                return new CursorLoader(
+                        this,
+                        MovieContract.MovieEntry.CONTENT_URI.buildUpon()
+                                .appendPath(Movie.Context.POPULAR.toString().toLowerCase()).build(),
+                        null,
+                        null,
+                        null,
+                        null
+                );
+            case MOVIE_TOP_RATED_LOADER:
+                return new CursorLoader(
+                        this,
+                        MovieContract.MovieEntry.CONTENT_URI.buildUpon()
+                                .appendPath(Movie.Context.TOP_RATED.toString().toLowerCase())
+                                .build(),
+                        null,
+                        null,
+                        null,
+                        null
+                );
+            case MOVIE_FAVORITE_LOADER:
+                return new CursorLoader(
+                        this,
+                        MovieContract.MovieEntry.CONTENT_URI.buildUpon()
+                                .appendPath(Movie.Context.FAVORITE.toString().toLowerCase()).build(),
+                        null,
+                        null,
+                        null,
+                        null
+                );
+            default:
+                return null;
+        }
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         ((SimpleItemRecyclerViewAdapter) mRecyclerView.getAdapter()).swapCursor(data);
+        mRecyclerView.scrollToPosition(0);
     }
 
     @Override
