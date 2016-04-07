@@ -15,13 +15,18 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.flaiker.popularmovies.contentprovider.MovieContract;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
 
 /**
  * Detail activity for a movie.
- * <p/>
+ * <p>
  * Not used on tablet devices.
  */
 public class MovieDetailActivity extends AppCompatActivity
@@ -29,6 +34,8 @@ public class MovieDetailActivity extends AppCompatActivity
 
     private ActionBar mActionBar;
     private ImageView mPosterView;
+
+    private FavoritesHelper mFavoritesHelper;
 
     private Uri mUri;
 
@@ -44,6 +51,8 @@ public class MovieDetailActivity extends AppCompatActivity
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        mFavoritesHelper = new FavoritesHelper(this);
 
         mPosterView = (ImageView) findViewById(R.id.detail_image_view);
 
@@ -95,5 +104,21 @@ public class MovieDetailActivity extends AppCompatActivity
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    public void swapFavoriteStatus(View view) {
+        long id = MovieContract.MovieEntry.getIdFromUri(mUri);
+
+        try {
+            // TODO: Find out if view got checked or unchecked
+            if (true) {
+                mFavoritesHelper.removeFavorite(id);
+            } else {
+                mFavoritesHelper.addFavorite(id);
+            }
+        } catch (IllegalArgumentException | JSONException e) {
+            Toast.makeText(this, String.format("Could not (un)favor: %s", e.getMessage()),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 }
