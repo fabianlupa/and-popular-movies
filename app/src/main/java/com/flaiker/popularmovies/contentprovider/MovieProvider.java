@@ -91,7 +91,9 @@ public class MovieProvider extends ContentProvider {
                 );
                 break;
             case MOVIE_WITH_ID:
-                selectionArgs = new String[]{MovieContract.MovieEntry.getIdFromUri(uri)};
+                selectionArgs = new String[]{
+                        String.valueOf(MovieContract.MovieEntry.getIdFromUri(uri))
+                };
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         true,
                         MovieContract.MovieEntry.TABLE_NAME,

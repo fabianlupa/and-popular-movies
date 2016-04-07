@@ -53,8 +53,8 @@ public class MovieContract {
          * @param uri The uri of the movie
          * @return The movie's id
          */
-        public static String getIdFromUri(Uri uri) {
-            return uri.getPathSegments().get(1);
+        public static long getIdFromUri(Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
 }
