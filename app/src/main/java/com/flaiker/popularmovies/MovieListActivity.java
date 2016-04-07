@@ -65,7 +65,7 @@ public class MovieListActivity extends AppCompatActivity
         // Start loading the movies
         getSupportLoaderManager().initLoader(MOVIE_POPULAR_LOADER, null, this).forceLoad();
         getSupportLoaderManager().initLoader(MOVIE_TOP_RATED_LOADER, null, this);
-        getSupportLoaderManager().initLoader(MOVIE_FAVORITE_LOADER, null, this);
+        //getSupportLoaderManager().initLoader(MOVIE_FAVORITE_LOADER, null, this);
 
         // TODO: Load movies using a service
         FetchMovieTask task = new FetchMovieTask(this);
@@ -124,7 +124,7 @@ public class MovieListActivity extends AppCompatActivity
                         null
                 );
             case MOVIE_FAVORITE_LOADER:
-                return new CursorLoader(
+                /*return new CursorLoader(
                         this,
                         MovieContract.MovieEntry.CONTENT_URI.buildUpon()
                                 .appendPath(Movie.Context.FAVORITE.toString().toLowerCase()).build(),
@@ -132,7 +132,7 @@ public class MovieListActivity extends AppCompatActivity
                         null,
                         null,
                         null
-                );
+                );*/
             default:
                 return null;
         }
