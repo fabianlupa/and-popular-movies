@@ -14,6 +14,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +25,10 @@ import android.widget.ImageView;
 import com.flaiker.popularmovies.contentprovider.MovieContract;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+
+import java.util.List;
+
 /**
  * Activity for showing movies loaded by {@link FetchMovieTask} in a grid.
  * <p/>
@@ -31,7 +36,7 @@ import com.squareup.picasso.Picasso;
  * launched to provide details.
  */
 public class MovieListActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+        implements LoaderManager.LoaderCallbacks<Cursor>, FavoritesHelper.FavoriteChangeListener {
 
     private static final int MOVIE_POPULAR_LOADER = 1;
     private static final int MOVIE_TOP_RATED_LOADER = 2;
@@ -39,6 +44,8 @@ public class MovieListActivity extends AppCompatActivity
 
     private boolean mTwoPane;
     private RecyclerView mRecyclerView;
+
+    private FavoritesHelper mFavoriteHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +69,13 @@ public class MovieListActivity extends AppCompatActivity
             mTwoPane = true;
         }
 
+        mFavoriteHelper = new FavoritesHelper(this);
+        mFavoriteHelper.addListener(this);
+
         // Start loading the movies
         getSupportLoaderManager().initLoader(MOVIE_POPULAR_LOADER, null, this).forceLoad();
         getSupportLoaderManager().initLoader(MOVIE_TOP_RATED_LOADER, null, this);
-        //getSupportLoaderManager().initLoader(MOVIE_FAVORITE_LOADER, null, this);
+        getSupportLoaderManager().initLoader(MOVIE_FAVORITE_LOADER, null, this);
 
         // TODO: Load movies using a service
         FetchMovieTask task = new FetchMovieTask(this);
@@ -85,14 +95,13 @@ public class MovieListActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_sort_popular:
-                getSupportLoaderManager().initLoader(MOVIE_POPULAR_LOADER, null, this).forceLoad();
+                getSupportLoaderManager().restartLoader(MOVIE_POPULAR_LOADER, null, this);
                 return true;
             case R.id.menu_sort_top_rated:
-                getSupportLoaderManager().initLoader(MOVIE_TOP_RATED_LOADER, null, this)
-                        .forceLoad();
+                getSupportLoaderManager().restartLoader(MOVIE_TOP_RATED_LOADER, null, this);
                 return true;
             case R.id.menu_sort_favorites:
-                getSupportLoaderManager().initLoader(MOVIE_FAVORITE_LOADER, null, this).forceLoad();
+                getSupportLoaderManager().restartLoader(MOVIE_FAVORITE_LOADER, null, this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -124,15 +133,25 @@ public class MovieListActivity extends AppCompatActivity
                         null
                 );
             case MOVIE_FAVORITE_LOADER:
-                /*return new CursorLoader(
+                String selection = MovieContract.MovieEntry.COLUMN_ID + " IN (?";
+                List<Long> favorites = null;
+                try {
+                    favorites = mFavoriteHelper.getFavorites();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                for (int i = 1; i < favorites.size(); i++) selection += ", ?";
+                selection += ")";
+
+                String[] selectionArgs = TextUtils.join(",", favorites).split(",");
+                return new CursorLoader(
                         this,
-                        MovieContract.MovieEntry.CONTENT_URI.buildUpon()
-                                .appendPath(Movie.Context.FAVORITE.toString().toLowerCase()).build(),
+                        MovieContract.MovieEntry.CONTENT_URI,
                         null,
-                        null,
-                        null,
+                        selection,
+                        selectionArgs,
                         null
-                );*/
+                );
             default:
                 return null;
         }
@@ -147,6 +166,11 @@ public class MovieListActivity extends AppCompatActivity
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         ((SimpleItemRecyclerViewAdapter) mRecyclerView.getAdapter()).swapCursor(null);
+    }
+
+    @Override
+    public void onFavoriteChange() {
+        getSupportLoaderManager().restartLoader(MOVIE_FAVORITE_LOADER, null, this);
     }
 
     public class SimpleItemRecyclerViewAdapter
