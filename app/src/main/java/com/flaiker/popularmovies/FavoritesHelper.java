@@ -79,6 +79,17 @@ public class FavoritesHelper {
         return movieList;
     }
 
+    /**
+     * Check if a movie is favored.
+     *
+     * @param movieId Movie's id
+     * @return Movie is currently in the favorites
+     * @throws JSONException
+     */
+    public boolean isMovieFavored(long movieId) throws JSONException {
+        return getFavorites().contains(movieId);
+    }
+
     private void persistList(List<Long> favorites) {
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.putString(PREFERENCES_KEY, new JSONArray(favorites).toString());

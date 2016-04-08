@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.flaiker.popularmovies.contentprovider.MovieContract;
 import com.squareup.picasso.Picasso;
@@ -26,7 +27,7 @@ import org.json.JSONException;
 
 /**
  * Detail activity for a movie.
- * <p>
+ * <p/>
  * Not used on tablet devices.
  */
 public class MovieDetailActivity extends AppCompatActivity
@@ -34,6 +35,7 @@ public class MovieDetailActivity extends AppCompatActivity
 
     private ActionBar mActionBar;
     private ImageView mPosterView;
+    private ToggleButton mFavoriteToggle;
 
     private FavoritesHelper mFavoritesHelper;
 
@@ -55,6 +57,8 @@ public class MovieDetailActivity extends AppCompatActivity
         mFavoritesHelper = new FavoritesHelper(this);
 
         mPosterView = (ImageView) findViewById(R.id.detail_image_view);
+
+        mFavoriteToggle = (ToggleButton) findViewById(R.id.detail_favorite_toggle);
 
         mUri = getIntent().getParcelableExtra(MovieDetailFragment.ARG_MOVIE_URI);
 
@@ -98,6 +102,12 @@ public class MovieDetailActivity extends AppCompatActivity
             mActionBar.setTitle(movie.getTitle());
             Picasso.with(this).load(movie.getBigImageUrl()).error(R.drawable.loading)
                     .into(mPosterView);
+
+            try {
+                mFavoriteToggle.setChecked(mFavoritesHelper.isMovieFavored(movie.getId()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -110,11 +120,12 @@ public class MovieDetailActivity extends AppCompatActivity
         long id = MovieContract.MovieEntry.getIdFromUri(mUri);
 
         try {
-            // TODO: Find out if view got checked or unchecked
-            if (true) {
+            if (!((ToggleButton) view).isChecked()) {
                 mFavoritesHelper.removeFavorite(id);
+                Toast.makeText(this, "Removed favorite", Toast.LENGTH_SHORT).show();
             } else {
                 mFavoritesHelper.addFavorite(id);
+                Toast.makeText(this, "Added favorite", Toast.LENGTH_SHORT).show();
             }
         } catch (IllegalArgumentException | JSONException e) {
             Toast.makeText(this, String.format("Could not (un)favor: %s", e.getMessage()),
