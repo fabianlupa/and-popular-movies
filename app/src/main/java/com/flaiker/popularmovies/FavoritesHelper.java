@@ -19,6 +19,7 @@ import java.util.List;
  */
 public class FavoritesHelper {
     private static final String PREFERENCES_KEY = "favorite_movies";
+    private static final List<FavoriteChangeListener> sListeners = new ArrayList<>();
     private final SharedPreferences mPreferences;
 
     public FavoritesHelper(Context context) {
@@ -90,9 +91,50 @@ public class FavoritesHelper {
         return getFavorites().contains(movieId);
     }
 
+    /**
+     * Add a change listener.
+     *
+     * @param listener The listener to add
+     */
+    public static void addListener(FavoriteChangeListener listener)
+            throws IllegalArgumentException {
+        if (sListeners.contains(listener))
+            throw new IllegalArgumentException("Listener already attached.");
+
+        sListeners.add(listener);
+    }
+
+    /**
+     * Remove a change listener.
+     *
+     * @param listener The listener to remove
+     */
+    public static void removeListener(FavoriteChangeListener listener)
+            throws IllegalArgumentException {
+        if (sListeners.contains(listener))
+            throw new IllegalArgumentException("Listener not attached.");
+
+        sListeners.remove(listener);
+    }
+
     private void persistList(List<Long> favorites) {
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.putString(PREFERENCES_KEY, new JSONArray(favorites).toString());
         editor.apply();
+        raiseUpdateEvent();
+    }
+
+    private void raiseUpdateEvent() {
+        for (FavoriteChangeListener listener : sListeners) listener.onFavoriteChange();
+    }
+
+    /**
+     * Event listener for subscribing to favorite changed events.
+     */
+    public interface FavoriteChangeListener {
+        /**
+         * List of favorites has been updated.
+         */
+        void onFavoriteChange();
     }
 }
