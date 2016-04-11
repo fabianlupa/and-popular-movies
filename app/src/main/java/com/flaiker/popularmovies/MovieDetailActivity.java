@@ -127,7 +127,7 @@ public class MovieDetailActivity extends AppCompatActivity
                 mFavoritesHelper.addFavorite(id);
                 Toast.makeText(this, "Added favorite", Toast.LENGTH_SHORT).show();
             }
-        } catch (IllegalArgumentException | JSONException e) {
+        } catch (IllegalArgumentException e) {
             Toast.makeText(this, String.format("Could not (un)favor: %s", e.getMessage()),
                     Toast.LENGTH_SHORT).show();
         }

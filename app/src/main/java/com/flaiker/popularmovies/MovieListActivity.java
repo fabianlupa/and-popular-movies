@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * Activity for showing movies loaded by {@link FetchMovieTask} in a grid.
- * <p>
+ * <p/>
  * On tablets a detail fragment is loaded in the view, on phones {@link MovieDetailActivity} is
  * launched to provide details.
  */
@@ -44,6 +44,7 @@ public class MovieListActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
 
     private FavoritesHelper mFavoriteHelper;
+    private int mCurrentLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +73,6 @@ public class MovieListActivity extends AppCompatActivity
 
         // Start loading the movies
         getSupportLoaderManager().initLoader(MOVIE_POPULAR_LOADER, null, this).forceLoad();
-        getSupportLoaderManager().initLoader(MOVIE_TOP_RATED_LOADER, null, this);
-        getSupportLoaderManager().initLoader(MOVIE_FAVORITE_LOADER, null, this);
 
         // TODO: Load movies using a service
         FetchMovieTask task = new FetchMovieTask(this);
@@ -93,12 +92,15 @@ public class MovieListActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_sort_popular:
+                mCurrentLoader = MOVIE_POPULAR_LOADER;
                 getSupportLoaderManager().restartLoader(MOVIE_POPULAR_LOADER, null, this);
                 return true;
             case R.id.menu_sort_top_rated:
+                mCurrentLoader = MOVIE_TOP_RATED_LOADER;
                 getSupportLoaderManager().restartLoader(MOVIE_TOP_RATED_LOADER, null, this);
                 return true;
             case R.id.menu_sort_favorites:
+                mCurrentLoader = MOVIE_FAVORITE_LOADER;
                 getSupportLoaderManager().restartLoader(MOVIE_FAVORITE_LOADER, null, this);
                 return true;
             default:
@@ -166,7 +168,8 @@ public class MovieListActivity extends AppCompatActivity
 
     @Override
     public void onFavoriteChange() {
-        getSupportLoaderManager().restartLoader(MOVIE_FAVORITE_LOADER, null, this);
+        if (mCurrentLoader == MOVIE_FAVORITE_LOADER)
+            getSupportLoaderManager().restartLoader(MOVIE_FAVORITE_LOADER, null, this);
     }
 
     public class SimpleItemRecyclerViewAdapter
