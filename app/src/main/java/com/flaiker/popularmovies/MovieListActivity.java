@@ -25,13 +25,11 @@ import android.widget.ImageView;
 import com.flaiker.popularmovies.contentprovider.MovieContract;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONException;
-
 import java.util.List;
 
 /**
  * Activity for showing movies loaded by {@link FetchMovieTask} in a grid.
- * <p/>
+ * <p>
  * On tablets a detail fragment is loaded in the view, on phones {@link MovieDetailActivity} is
  * launched to provide details.
  */
@@ -70,7 +68,7 @@ public class MovieListActivity extends AppCompatActivity
         }
 
         mFavoriteHelper = new FavoritesHelper(this);
-        mFavoriteHelper.addListener(this);
+        FavoritesHelper.addListener(this);
 
         // Start loading the movies
         getSupportLoaderManager().initLoader(MOVIE_POPULAR_LOADER, null, this).forceLoad();
@@ -133,16 +131,14 @@ public class MovieListActivity extends AppCompatActivity
                         null
                 );
             case MOVIE_FAVORITE_LOADER:
+                List<Long> favorites = mFavoriteHelper.getFavorites();
+
+                // Create a selection in the form of " id IN (?, ?, ?, ...)"
                 String selection = MovieContract.MovieEntry.COLUMN_ID + " IN (?";
-                List<Long> favorites = null;
-                try {
-                    favorites = mFavoriteHelper.getFavorites();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
                 for (int i = 1; i < favorites.size(); i++) selection += ", ?";
                 selection += ")";
 
+                // Convert the list of favorites to a string array of favorites
                 String[] selectionArgs = TextUtils.join(",", favorites).split(",");
                 return new CursorLoader(
                         this,

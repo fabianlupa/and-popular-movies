@@ -31,9 +31,8 @@ public class FavoritesHelper {
      *
      * @param movieId Movie's id
      * @throws IllegalArgumentException
-     * @throws JSONException
      */
-    public void addFavorite(long movieId) throws IllegalArgumentException, JSONException {
+    public void addFavorite(long movieId) throws IllegalArgumentException {
         List<Long> favorites = getFavorites();
 
         if (favorites.contains(movieId))
@@ -48,9 +47,8 @@ public class FavoritesHelper {
      *
      * @param movieId Movie's id
      * @throws IllegalArgumentException
-     * @throws JSONException
      */
-    public void removeFavorite(long movieId) throws IllegalArgumentException, JSONException {
+    public void removeFavorite(long movieId) throws IllegalArgumentException {
         List<Long> favorites = getFavorites();
 
         if (!favorites.contains(movieId))
@@ -65,16 +63,20 @@ public class FavoritesHelper {
      * Get currently favored movies.
      *
      * @return List of favored movies
-     * @throws JSONException
      */
-    public List<Long> getFavorites() throws JSONException {
+    public List<Long> getFavorites() {
         List<Long> movieList = new ArrayList<>();
 
-        String movieJson = mPreferences.getString(PREFERENCES_KEY, "[]");
-        JSONArray movieArray = new JSONArray(movieJson);
+        try {
+            String movieJson = mPreferences.getString(PREFERENCES_KEY, "[]");
+            JSONArray movieArray = new JSONArray(movieJson);
 
-        for (int i = 0; i < movieArray.length(); i++) {
-            movieList.add(movieArray.getLong(i));
+            for (int i = 0; i < movieArray.length(); i++) {
+                movieList.add(movieArray.getLong(i));
+            }
+        } catch (JSONException e) {
+            // Return an empty list if a json exception occurred
+            movieList.clear();
         }
 
         return movieList;
