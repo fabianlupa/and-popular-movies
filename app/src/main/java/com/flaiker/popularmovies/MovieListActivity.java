@@ -44,7 +44,7 @@ public class MovieListActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
 
     private FavoritesHelper mFavoriteHelper;
-    private int mCurrentLoader;
+    private int mCurrentLoader = MOVIE_POPULAR_LOADER;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
