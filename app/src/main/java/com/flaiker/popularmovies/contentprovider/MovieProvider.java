@@ -25,9 +25,9 @@ public class MovieProvider extends ContentProvider {
     private static final String sMoviesByContextSelection =
             MovieContract.MovieEntry.COLUMN_CONTEXT + " = ?";
 
-    private static final int MOVIES_POPULAR = 100;
-    private static final int MOVIES_TOP_RATED = 101;
-    private static final int MOVIES_FAVORITES = 102;
+    private static final int MOVIES = 100;
+    private static final int MOVIES_POPULAR = 101;
+    private static final int MOVIES_TOP_RATED = 102;
     private static final int MOVIE_WITH_ID = 103;
 
     private MovieDbHelper mOpenHelper;
@@ -36,10 +36,9 @@ public class MovieProvider extends ContentProvider {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
 
-        matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIES_POPULAR);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIES);
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/popular", MOVIES_POPULAR);
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/top_rated", MOVIES_TOP_RATED);
-        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/favorites", MOVIES_FAVORITES);
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/*", MOVIE_WITH_ID);
 
         return matcher;
@@ -58,6 +57,17 @@ public class MovieProvider extends ContentProvider {
         Cursor retCursor;
 
         switch (sUriMatcher.match(uri)) {
+            case MOVIES:
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
             case MOVIES_POPULAR:
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_NAME,
@@ -80,19 +90,10 @@ public class MovieProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
-            case MOVIES_FAVORITES:
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        MovieContract.MovieEntry.TABLE_NAME,
-                        projection,
-                        sMoviesByContextSelection,
-                        new String[]{Movie.Context.FAVORITE.toString()},
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
             case MOVIE_WITH_ID:
-                selectionArgs = new String[]{MovieContract.MovieEntry.getIdFromUri(uri)};
+                selectionArgs = new String[]{
+                        String.valueOf(MovieContract.MovieEntry.getIdFromUri(uri))
+                };
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         true,
                         MovieContract.MovieEntry.TABLE_NAME,
@@ -119,6 +120,8 @@ public class MovieProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
+            case MOVIES:
+            case MOVIES_TOP_RATED:
             case MOVIES_POPULAR:
                 return MovieContract.MovieEntry.CONTENT_TYPE;
             case MOVIE_WITH_ID:
@@ -133,7 +136,7 @@ public class MovieProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {
-            case MOVIES_POPULAR:
+            case MOVIES:
                 db.beginTransaction();
                 int returnCount = 0;
                 try {
@@ -162,7 +165,7 @@ public class MovieProvider extends ContentProvider {
         Uri returnUri;
 
         switch (match) {
-            case MOVIES_POPULAR: {
+            case MOVIES: {
                 long id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
                 if (id > 0) {
                     returnUri = MovieContract.MovieEntry.buildMovieUri(id);
@@ -187,7 +190,7 @@ public class MovieProvider extends ContentProvider {
         if (null == selection) selection = "1";
 
         switch (match) {
-            case MOVIES_POPULAR:
+            case MOVIES:
                 rowsDeleted =
                         db.delete(MovieContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
                 break;
@@ -207,7 +210,7 @@ public class MovieProvider extends ContentProvider {
         int rowsUpdated;
 
         switch (match) {
-            case MOVIES_POPULAR:
+            case MOVIES:
                 rowsUpdated = db.update(MovieContract.MovieEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;

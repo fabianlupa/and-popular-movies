@@ -61,6 +61,10 @@
                 tools:context="com.flaiker.popularmovies.MovieDetailFragment"
                 tools:text="VOTES" />
 
+            <ToggleButton
+                android:id="@+id/movie_detail_favorite_toggle"
+                style="@style/favorite_button" />
+
         </LinearLayout>
 
         <ScrollView

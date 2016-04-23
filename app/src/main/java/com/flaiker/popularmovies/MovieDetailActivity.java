@@ -15,7 +15,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 
@@ -25,10 +28,13 @@ import com.squareup.picasso.Picasso;
  * Not used on tablet devices.
  */
 public class MovieDetailActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+        implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
     private ActionBar mActionBar;
     private ImageView mPosterView;
+    private ToggleButton mFavoriteToggle;
+
+    private FavoritesHelper mFavoritesHelper;
 
     private Uri mUri;
 
@@ -45,7 +51,14 @@ public class MovieDetailActivity extends AppCompatActivity
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        mFavoritesHelper = new FavoritesHelper(this);
+
         mPosterView = (ImageView) findViewById(R.id.detail_image_view);
+
+        mFavoriteToggle = (ToggleButton) findViewById(R.id.detail_favorite_toggle);
+        if (mFavoriteToggle != null) {
+            mFavoriteToggle.setOnClickListener(this);
+        }
 
         mUri = getIntent().getParcelableExtra(MovieDetailFragment.ARG_MOVIE_URI);
 
@@ -89,11 +102,24 @@ public class MovieDetailActivity extends AppCompatActivity
             mActionBar.setTitle(movie.getTitle());
             Picasso.with(this).load(movie.getBigImageUrl()).error(R.drawable.loading)
                     .into(mPosterView);
+
+            mFavoriteToggle.setChecked(mFavoritesHelper.isMovieFavored(movie.getId()));
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.detail_favorite_toggle:
+                String msg = FavoritesHelper
+                        .swapFavoriteStatusFromToggleButton((ToggleButton) v, mUri, mFavoritesHelper);
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+                break;
+        }
     }
 }

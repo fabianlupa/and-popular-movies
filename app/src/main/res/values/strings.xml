@@ -4,4 +4,6 @@
     <string name="menu_sort_popular">Popular</string>
     <string name="menu_sort_top_rated">Top Rated</string>
     <string name="menu_sort_favorites">Favorites</string>
+    <string name="add_favorite">Add favorite</string>
+    <string name="remove_favorite">Remove favorite</string>
 </resources>
