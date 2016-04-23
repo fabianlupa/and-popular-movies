@@ -38,14 +38,7 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-                <ToggleButton
-                    android:id="@+id/detail_favorite_toggle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:onClick="swapFavoriteStatus"
-                    android:textOff="@string/add_favorite"
-                    android:textOn="@string/remove_favorite" />
+                <include layout="@layout/favorite" />
 
             </android.support.v7.widget.Toolbar>
 
