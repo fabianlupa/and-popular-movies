@@ -38,7 +38,9 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-                <include layout="@layout/favorite" />
+                <ToggleButton
+                    android:id="@+id/detail_favorite_toggle"
+                    style="@style/favorite_button" />
 
             </android.support.v7.widget.Toolbar>
 

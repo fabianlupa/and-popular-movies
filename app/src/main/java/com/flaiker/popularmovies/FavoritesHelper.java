@@ -6,7 +6,11 @@ package com.flaiker.popularmovies;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.widget.ToggleButton;
+
+import com.flaiker.popularmovies.contentprovider.MovieContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -87,9 +91,8 @@ public class FavoritesHelper {
      *
      * @param movieId Movie's id
      * @return Movie is currently in the favorites
-     * @throws JSONException
      */
-    public boolean isMovieFavored(long movieId) throws JSONException {
+    public boolean isMovieFavored(long movieId) {
         return getFavorites().contains(movieId);
     }
 
@@ -117,6 +120,32 @@ public class FavoritesHelper {
             throw new IllegalArgumentException("Listener not attached.");
 
         sListeners.remove(listener);
+    }
+
+    /**
+     * Static helper function to add/remove a favorite using ToggleButton.
+     *
+     * @param button          The button which was just pressed
+     * @param uri             Uri of the movie
+     * @param favoritesHelper FavoriteHelper instance
+     * @return Message to be shown using toasts or something similar
+     */
+    public static String swapFavoriteStatusFromToggleButton(ToggleButton button, Uri uri,
+                                                            FavoritesHelper favoritesHelper) {
+        long id = MovieContract.MovieEntry.getIdFromUri(uri);
+
+        try {
+            if (button.isChecked()) {
+                favoritesHelper.addFavorite(id);
+                return "Added favorite";
+            } else {
+                favoritesHelper.removeFavorite(id);
+                return "Removed favorite";
+            }
+        } catch (IllegalArgumentException e) {
+            return String.format("Could not (un)favor: %s", e.getMessage());
+        }
+
     }
 
     private void persistList(List<Long> favorites) {

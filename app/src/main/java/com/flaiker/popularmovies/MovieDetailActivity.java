@@ -20,10 +20,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.flaiker.popularmovies.contentprovider.MovieContract;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONException;
 
 /**
  * Detail activity for a movie.
@@ -31,7 +28,7 @@ import org.json.JSONException;
  * Not used on tablet devices.
  */
 public class MovieDetailActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+        implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
     private ActionBar mActionBar;
     private ImageView mPosterView;
@@ -59,6 +56,9 @@ public class MovieDetailActivity extends AppCompatActivity
         mPosterView = (ImageView) findViewById(R.id.detail_image_view);
 
         mFavoriteToggle = (ToggleButton) findViewById(R.id.detail_favorite_toggle);
+        if (mFavoriteToggle != null) {
+            mFavoriteToggle.setOnClickListener(this);
+        }
 
         mUri = getIntent().getParcelableExtra(MovieDetailFragment.ARG_MOVIE_URI);
 
@@ -103,11 +103,7 @@ public class MovieDetailActivity extends AppCompatActivity
             Picasso.with(this).load(movie.getBigImageUrl()).error(R.drawable.loading)
                     .into(mPosterView);
 
-            try {
-                mFavoriteToggle.setChecked(mFavoritesHelper.isMovieFavored(movie.getId()));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            mFavoriteToggle.setChecked(mFavoritesHelper.isMovieFavored(movie.getId()));
         }
     }
 
@@ -116,20 +112,14 @@ public class MovieDetailActivity extends AppCompatActivity
 
     }
 
-    public void swapFavoriteStatus(View view) {
-        long id = MovieContract.MovieEntry.getIdFromUri(mUri);
-
-        try {
-            if (!((ToggleButton) view).isChecked()) {
-                mFavoritesHelper.removeFavorite(id);
-                Toast.makeText(this, "Removed favorite", Toast.LENGTH_SHORT).show();
-            } else {
-                mFavoritesHelper.addFavorite(id);
-                Toast.makeText(this, "Added favorite", Toast.LENGTH_SHORT).show();
-            }
-        } catch (IllegalArgumentException e) {
-            Toast.makeText(this, String.format("Could not (un)favor: %s", e.getMessage()),
-                    Toast.LENGTH_SHORT).show();
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.detail_favorite_toggle:
+                String msg = FavoritesHelper
+                        .swapFavoriteStatusFromToggleButton((ToggleButton) v, mUri, mFavoritesHelper);
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+                break;
         }
     }
 }

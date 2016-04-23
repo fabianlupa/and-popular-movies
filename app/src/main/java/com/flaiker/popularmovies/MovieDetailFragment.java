@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 
@@ -28,19 +30,23 @@ import java.util.Locale;
  * Fragment for a movie detail screen. Used by {@link MovieDetailActivity} on smartphones and
  * {@link MovieListActivity} on tablets.
  */
-public class MovieDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+        View.OnClickListener {
+
     /**
      * ID of the movie to provide details for
      */
     public static final String ARG_MOVIE_URI = "movie_uri";
 
     private Uri mUri;
+    private FavoritesHelper mFavoritesHelper;
 
     private TextView mReleaseDate;
     private TextView mRating;
     private TextView mSynopsis;
     private TextView mTitleTablet;
     private ImageView mImageTablet;
+    private ToggleButton mFavoriteToggle;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -52,6 +58,8 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mFavoritesHelper = new FavoritesHelper(getActivity());
 
         if (getArguments().containsKey(ARG_MOVIE_URI)) {
             mUri = getArguments().getParcelable(ARG_MOVIE_URI);
@@ -90,6 +98,9 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         mTitleTablet = (TextView) rootView.findViewById(R.id.movie_detail_title);
         mImageTablet = (ImageView) rootView.findViewById(R.id.movie_detail_poster_tablet);
 
+        mFavoriteToggle = (ToggleButton) rootView.findViewById(R.id.detail_favorite_toggle);
+        if (mFavoriteToggle != null) mFavoriteToggle.setOnClickListener(this);
+
         return rootView;
     }
 
@@ -117,10 +128,25 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                         .into(mImageTablet);
             }
             if (mTitleTablet != null) mTitleTablet.setText(movie.getTitle());
+
+            if (mFavoriteToggle != null) {
+                mFavoriteToggle.setChecked(mFavoritesHelper.isMovieFavored(movie.getId()));
+            }
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.detail_favorite_toggle:
+                String msg = FavoritesHelper
+                        .swapFavoriteStatusFromToggleButton((ToggleButton) v, mUri, mFavoritesHelper);
+                Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+                break;
+        }
     }
 }
