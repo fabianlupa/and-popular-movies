@@ -132,6 +132,17 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             if (mFavoriteToggle != null) {
                 mFavoriteToggle.setChecked(mFavoritesHelper.isMovieFavored(movie.getId()));
             }
+
+            // Fetch the details of the movie
+            FetchMovieDetailsTask task = new FetchMovieDetailsTask(
+                    new FetchMovieDetailsTask.Callback() {
+                @Override
+                public void onFinish(FetchMovieDetailsTask.ResultBundle result) {
+                    // TODO: fill trailer list
+                    // TODO: fill review list
+                }
+            });
+            task.execute(String.valueOf(movie.getId()));
         }
     }
 
