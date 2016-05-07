@@ -4,6 +4,7 @@
 
 package com.flaiker.popularmovies;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -247,6 +248,13 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             if (trailer == null) return;
 
             holder.mNameTextView.setText(trailer.mName);
+            holder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("http://www.youtube.com/watch?v=" + trailer.mKey)));
+                }
+            });
         }
 
         @Override
