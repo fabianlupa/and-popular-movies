@@ -12,6 +12,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +26,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -47,6 +50,8 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private TextView mTitleTablet;
     private ImageView mImageTablet;
     private ToggleButton mFavoriteToggle;
+    private RecyclerView mReviewRecyclerView;
+    private RecyclerView mTrailersRecyclerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -97,6 +102,14 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         mRating = ((TextView) rootView.findViewById(R.id.movie_detail_votes));
         mTitleTablet = (TextView) rootView.findViewById(R.id.movie_detail_title);
         mImageTablet = (ImageView) rootView.findViewById(R.id.movie_detail_poster_tablet);
+        mTrailersRecyclerView = (RecyclerView) rootView.findViewById(R.id.trailer_recyclerview);
+        mReviewRecyclerView = (RecyclerView) rootView.findViewById(R.id.review_recyclerview);
+        mReviewRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()) {
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        });
 
         mFavoriteToggle = (ToggleButton) rootView.findViewById(R.id.detail_favorite_toggle);
         if (mFavoriteToggle != null) mFavoriteToggle.setOnClickListener(this);
@@ -136,12 +149,17 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             // Fetch the details of the movie
             FetchMovieDetailsTask task = new FetchMovieDetailsTask(
                     new FetchMovieDetailsTask.Callback() {
-                @Override
-                public void onFinish(FetchMovieDetailsTask.ResultBundle result) {
-                    // TODO: fill trailer list
-                    // TODO: fill review list
-                }
-            });
+                        @Override
+                        public void onFinish(FetchMovieDetailsTask.ResultBundle result) {
+                            // Fill the reviews
+                            mReviewRecyclerView.setAdapter(new ReviewsRecyclerViewAdapter(
+                                    result.mReviews));
+
+                            // Fill the trailers
+                            mTrailersRecyclerView.setAdapter(new TrailersRecyclerViewAdapter(
+                                    result.mVideos));
+                        }
+                    });
             task.execute(String.valueOf(movie.getId()));
         }
     }
@@ -158,6 +176,93 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                         .swapFavoriteStatusFromToggleButton((ToggleButton) v, mUri, mFavoritesHelper);
                 Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
                 break;
+        }
+    }
+
+    public class ReviewsRecyclerViewAdapter
+            extends RecyclerView.Adapter<ReviewsRecyclerViewAdapter.ViewHolder> {
+        private List<FetchMovieDetailsTask.ResultBundle.Review> mReviews;
+
+        public ReviewsRecyclerViewAdapter(
+                List<FetchMovieDetailsTask.ResultBundle.Review> reviews) {
+            mReviews = reviews;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.movie_review_content, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(final ViewHolder holder, int position) {
+            final FetchMovieDetailsTask.ResultBundle.Review review = mReviews.get(position);
+
+            if (review == null) return;
+
+            holder.mAuthorTextView.setText(review.mAuthor);
+            holder.mContentTextView.setText(review.mContent);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mReviews.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public final View mView;
+            public final TextView mAuthorTextView;
+            public final TextView mContentTextView;
+
+            public ViewHolder(View view) {
+                super(view);
+                mView = view;
+                mAuthorTextView = (TextView) view.findViewById(R.id.review_author);
+                mContentTextView = (TextView) view.findViewById(R.id.review_text);
+            }
+        }
+    }
+
+    public class TrailersRecyclerViewAdapter
+            extends RecyclerView.Adapter<TrailersRecyclerViewAdapter.ViewHolder> {
+        private List<FetchMovieDetailsTask.ResultBundle.Video> mTrailers;
+
+        public TrailersRecyclerViewAdapter(
+                List<FetchMovieDetailsTask.ResultBundle.Video> trailers) {
+            mTrailers = trailers;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.movie_trailer_content, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(final ViewHolder holder, int position) {
+            final FetchMovieDetailsTask.ResultBundle.Video trailer = mTrailers.get(position);
+
+            if (trailer == null) return;
+
+            holder.mNameTextView.setText(trailer.mName);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mTrailers.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public final View mView;
+            public final TextView mNameTextView;
+
+            public ViewHolder(View view) {
+                super(view);
+                mView = view;
+                mNameTextView = (TextView) view.findViewById(R.id.trailer_name);
+            }
         }
     }
 }
