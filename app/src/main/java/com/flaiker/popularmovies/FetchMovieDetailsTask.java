@@ -112,6 +112,9 @@ public class FetchMovieDetailsTask
         void onFinish(ResultBundle result);
     }
 
+    /**
+     * Bundle of the results fo this task.
+     */
     public static class ResultBundle {
         public final List<Video> mVideos;
         public final List<Review> mReviews;
