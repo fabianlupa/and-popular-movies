@@ -6,4 +6,6 @@
     <string name="menu_sort_favorites">Favorites</string>
     <string name="add_favorite">Add favorite</string>
     <string name="remove_favorite">Remove favorite</string>
+    <string name="trailers">Trailers:</string>
+    <string name="reviews">Reviews:</string>
 </resources>

@@ -38,4 +38,31 @@
         android:padding="16dp"
         tools:context="com.flaiker.popularmovies.MovieDetailFragment"
         tools:text="LOREM LOREM LOREM IPSUM IPSUM IPSUM LOREM LOREM LOREM IPSUM IPSUM IPSUM" />
+
+    <TextView
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/trailers" />
+
+    <android.support.v7.widget.RecyclerView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/trailer_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layoutManager="LinearLayoutManager"
+        tools:listitem="@layout/movie_trailer_content" />
+
+    <TextView
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/reviews" />
+
+    <android.support.v7.widget.RecyclerView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/review_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/movie_review_content" />
+
 </LinearLayout>

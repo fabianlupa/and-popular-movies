@@ -38,9 +38,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
     private static final String MOVIE_RELEASE_DATE_KEY = "release_date";
     private static final String MOVIE_VOTE_AVERAGE_KEY = "vote_average";
     private static final String MOVIE_OVERVIEW_KEY = "overview";
-    private static final String IMAGE_BASE_PATH = "https://image.tmdb.org/t/p/";
-    private static final String IMAGE_MEDIUM_RES = "w342/";
-    private static final String IMAGE_HIGH_RES = "w780/";
 
     private final Context mContext;
 
@@ -86,15 +83,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             Vector<ContentValues> vector = new Vector<>(results.length());
             for (int i = 0; i < results.length(); i++) {
                 JSONObject jsonMovie = results.getJSONObject(i);
-                /*Movie movie = new Movie(jsonMovie.getString(MOVIE_ID_KEY),
-                        jsonMovie.getString(MOVIE_TITLE_KEY),
-                        IMAGE_BASE_PATH + IMAGE_MEDIUM_RES + jsonMovie.getString(MOVIE_POSTER_KEY),
-                        IMAGE_BASE_PATH + IMAGE_HIGH_RES + jsonMovie.getString(MOVIE_POSTER_KEY),
-                        new SimpleDateFormat("yyyy-MM-DD", Locale.US)
-                                .parse(jsonMovie.getString(MOVIE_RELEASE_DATE_KEY)),
-                        Float.parseFloat(jsonMovie.getString(MOVIE_VOTE_AVERAGE_KEY)),
-                        jsonMovie.getString(MOVIE_OVERVIEW_KEY));
-                resultList.put(movie.getId(), movie);*/
 
                 ContentValues values = new ContentValues();
                 values.put(MovieContract.MovieEntry.COLUMN_ID, jsonMovie.getString(MOVIE_ID_KEY));
