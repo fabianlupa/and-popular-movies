@@ -39,6 +39,7 @@ public class MovieListActivity extends AppCompatActivity
     private static final int MOVIE_POPULAR_LOADER = 1;
     private static final int MOVIE_TOP_RATED_LOADER = 2;
     private static final int MOVIE_FAVORITE_LOADER = 3;
+    private static final String SAVED_LOADER = "loader";
 
     private boolean mTwoPane;
     private RecyclerView mRecyclerView;
@@ -71,8 +72,13 @@ public class MovieListActivity extends AppCompatActivity
         mFavoriteHelper = new FavoritesHelper(this);
         FavoritesHelper.addListener(this);
 
+        // Restore saved instance state if it exists
+        if (savedInstanceState != null && !savedInstanceState.isEmpty()) {
+            mCurrentLoader = savedInstanceState.getInt(SAVED_LOADER);
+        }
+
         // Start loading the movies
-        getSupportLoaderManager().initLoader(MOVIE_POPULAR_LOADER, null, this).forceLoad();
+        getSupportLoaderManager().initLoader(mCurrentLoader, null, this).forceLoad();
 
         // TODO: Load movies using a service
         FetchMovieTask task = new FetchMovieTask(this);
@@ -170,6 +176,14 @@ public class MovieListActivity extends AppCompatActivity
     public void onFavoriteChange() {
         if (mCurrentLoader == MOVIE_FAVORITE_LOADER)
             getSupportLoaderManager().restartLoader(MOVIE_FAVORITE_LOADER, null, this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Save the currently selected sort order / loader
+        outState.putInt(SAVED_LOADER, mCurrentLoader);
+
+        super.onSaveInstanceState(outState);
     }
 
     public class SimpleItemRecyclerViewAdapter
