@@ -62,7 +62,7 @@
                 tools:text="VOTES" />
 
             <ToggleButton
-                android:id="@+id/movie_detail_favorite_toggle"
+                android:id="@+id/detail_favorite_toggle"
                 style="@style/favorite_button" />
 
         </LinearLayout>
